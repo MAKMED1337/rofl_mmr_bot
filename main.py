@@ -21,11 +21,14 @@ def none_to_str(s: str | None, default: str='') -> str:
 		return default
 	return s
 
-def get_username(user):
+def get_username_raw(user):
 	return f'{none_to_str(user.first_name)} {none_to_str(user.last_name)}'
 
+def escape_username(username):
+	return html.escape(username).replace('/', '/&NoBreak;')
+
 async def update_sender(msg):
-	await LastUsername.update(msg.sender_id, get_username(msg.sender))
+	await LastUsername.update(msg.sender_id, get_username_raw(msg.sender))
 
 @bot.on(events.NewMessage(pattern=command_to_regex('mmr')))
 async def mmr(msg: Message):
@@ -55,26 +58,27 @@ async def mmr(msg: Message):
 	
 	await msg.reply(f'Твій рейтинг {"виріс" if delta > 0 else "зменшився"} на {abs(delta)} MMR. Тепер твій рейтинг {rating} MMR.')
 
-def crop_message(s: str) -> str:
-	return s[:4096]
-
 async def stringify_top(group_id: int, limit: int=None) -> str:
 	top = await Rating.get_top_with_names(group_id, limit)
 
 	info = f'Топ{"" if limit is None else " " + str(limit)} по MMR:\n\n'
 	for i, (username, rating) in enumerate(top, 1):
-		info += f'{i}) {html.escape(username)} — {rating} MMR\n'
+		line = f'{i}) {escape_username(username)} — {rating} MMR\n'
+		if len(info) + len(line) > 4096:
+			break
+		info += line
+	print(info)
 	return info
 
 @bot.on(events.NewMessage(pattern=command_to_regex('top')))
 async def top(msg: Message):
 	await update_sender(msg)
-	await msg.reply(crop_message(await stringify_top(msg.chat.id)))
+	await msg.reply(await stringify_top(msg.chat.id))
 
 @bot.on(events.NewMessage(pattern=command_to_regex('top10')))
 async def top10(msg: Message):
 	await update_sender(msg)
-	await msg.reply(crop_message(await stringify_top(msg.chat.id, 10)))
+	await msg.reply(await stringify_top(msg.chat.id, 10))
 
 async def main():
 	try:
