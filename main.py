@@ -10,7 +10,8 @@ import html
 
 from db_config import start as db_start, db
 from bot_config import run as run_bot, bot, command_to_regex
-from config import *
+from message_cleanup import run as run_cleanup, queue_message
+from config import cooldown, mn, mx
 
 from last_request import LastRequest
 from last_username import LastUsername
@@ -30,12 +31,19 @@ def escape_username(username):
 async def update_sender(msg):
 	await LastUsername.update(msg.sender_id, get_username_raw(msg.sender))
 
-@bot.on(events.NewMessage(pattern=command_to_regex('mmr')))
-async def mmr(msg: Message):
-	await update_sender(msg)
+def command(command: str):
+	def inner(func):
+		@bot.on(events.NewMessage(pattern=command_to_regex(command)))
+		async def handler(msg: Message):
+			await update_sender(msg)
+			await queue_message(msg)
+			return await func(msg)
+	return inner
 
+@command('mmr')
+async def mmr(msg: Message):
 	user_id = msg.sender_id
-	group_id = msg.chat.id
+	group_id = msg.chat_id
 
 	now = datetime.now()
 	async with db.transaction():
@@ -43,7 +51,8 @@ async def mmr(msg: Message):
 		if last is not None:
 			left = ceil(cooldown - (now - last).total_seconds())
 			if left > 0:
-				await msg.reply(f'Потрібно зачекати ще {time.strftime("%H:%M:%S", time.gmtime(left))}')
+				r = await msg.reply(f'Потрібно зачекати ще {time.strftime("%H:%M:%S", time.gmtime(left))}')
+				await queue_message(r)
 				return
 		
 		await LastRequest.update(user_id, group_id)
@@ -56,7 +65,8 @@ async def mmr(msg: Message):
 	rating += delta
 	await Rating.update(user_id, group_id, rating)
 	
-	await msg.reply(f'Твій рейтинг {"виріс" if delta > 0 else "зменшився"} на {abs(delta)} MMR. Тепер твій рейтинг {rating} MMR.')
+	r = await msg.reply(f'Твій рейтинг {"виріс" if delta > 0 else "зменшився"} на {abs(delta)} MMR. Тепер твій рейтинг {rating} MMR.')
+	await queue_message(r)
 
 async def stringify_top(group_id: int, limit: int=None) -> str:
 	top = await Rating.get_top_with_names(group_id, limit)
@@ -67,23 +77,20 @@ async def stringify_top(group_id: int, limit: int=None) -> str:
 		if len(info) + len(line) > 4096:
 			break
 		info += line
-	print(info)
 	return info
 
-@bot.on(events.NewMessage(pattern=command_to_regex('top')))
+@command('top')
 async def top(msg: Message):
-	await update_sender(msg)
-	await msg.reply(await stringify_top(msg.chat.id))
+	await queue_message(await msg.reply(await stringify_top(msg.chat_id)))
 
-@bot.on(events.NewMessage(pattern=command_to_regex('top10')))
+@command('top10')
 async def top10(msg: Message):
-	await update_sender(msg)
-	await msg.reply(await stringify_top(msg.chat.id, 10))
+	await queue_message(await msg.reply(await stringify_top(msg.chat_id, 10)))
 
 async def main():
 	try:
 		await db_start()
-		await run_bot()
+		await asyncio.gather(run_cleanup(), run_bot())
 	except asyncio.CancelledError:
 		pass
 	except BaseException:
