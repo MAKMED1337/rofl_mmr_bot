@@ -8,6 +8,8 @@ def command_to_regex(command: str) -> str:
 	return fr'\/{command}(@{BOT_NAME})?$'
 
 bot = TelegramClient('bot', os.getenv('API_ID'), os.getenv('API_HASH'))
+bot.parse_mode = 'html'
+
 async def run():
 	await bot.start(bot_token=os.getenv('TOKEN'))
 	await bot.catch_up()

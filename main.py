@@ -6,6 +6,7 @@ from datetime import datetime
 import random
 from math import ceil
 import time
+import html
 
 from db_config import start as db_start, db
 from bot_config import run as run_bot, bot, command_to_regex
@@ -62,7 +63,7 @@ async def stringify_top(group_id: int, limit: int=None) -> str:
 
 	info = f'Топ{"" if limit is None else " " + str(limit)} по MMR:\n\n'
 	for i, (username, rating) in enumerate(top, 1):
-		info += f'{i}) {username} — {rating} MMR\n'
+		info += f'{i}) {html.escape(username)} — {rating} MMR\n'
 	return info
 
 @bot.on(events.NewMessage(pattern=command_to_regex('top')))
