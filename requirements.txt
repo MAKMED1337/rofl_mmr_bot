@@ -1,0 +1,3 @@
+databases==0.7.0
+SQLAlchemy==1.4.46
+Telethon==1.26.1

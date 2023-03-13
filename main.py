@@ -8,7 +8,7 @@ from math import ceil
 import time
 
 from db_config import start as db_start, db
-from bot_config import run as run_bot, bot
+from bot_config import run as run_bot, bot, command_to_regex
 from config import *
 
 from last_request import LastRequest
@@ -26,7 +26,7 @@ def get_username(user):
 async def update_sender(msg):
 	await LastUsername.update(msg.sender_id, get_username(msg.sender))
 
-@bot.on(events.NewMessage(pattern=r'\/mmr(@rofl_mmr_bot)?$'))
+@bot.on(events.NewMessage(pattern=command_to_regex('mmr')))
 async def mmr(msg: Message):
 	await update_sender(msg)
 
@@ -65,12 +65,12 @@ async def stringify_top(group_id: int, limit: int=None) -> str:
 		info += f'{i}) {username} — {rating} MMR\n'
 	return info
 
-@bot.on(events.NewMessage(pattern=r'\/top(@rofl_mmr_bot)?$'))
+@bot.on(events.NewMessage(pattern=command_to_regex('top')))
 async def top(msg: Message):
 	await update_sender(msg)
 	await msg.reply(crop_message(await stringify_top(msg.chat.id)))
 
-@bot.on(events.NewMessage(pattern=r'\/top10(@rofl_mmr_bot)?$'))
+@bot.on(events.NewMessage(pattern=command_to_regex('top10')))
 async def top10(msg: Message):
 	await update_sender(msg)
 	await msg.reply(crop_message(await stringify_top(msg.chat.id, 10)))
