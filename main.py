@@ -23,7 +23,7 @@ def none_to_str(s: str | None, default: str='') -> str:
 	return s
 
 def get_username_raw(user):
-	return f'{none_to_str(user.first_name)} {none_to_str(user.last_name)}'
+	return ' '.join([none_to_str(i) for i in (user.first_name, user.last_name)])
 
 def escape_username(username):
 	return html.escape(username).replace('/', '/&NoBreak;')
@@ -45,11 +45,10 @@ async def mmr(msg: Message):
 	user_id = msg.sender_id
 	group_id = msg.chat_id
 
-	now = datetime.now()
 	async with db.transaction():
 		last = await LastRequest.get(user_id, group_id)
 		if last is not None:
-			left = ceil(cooldown - (now - last).total_seconds())
+			left = ceil((last + cooldown - datetime.now()).total_seconds())
 			if left > 0:
 				r = await msg.reply(f'Потрібно зачекати ще {time.strftime("%H:%M:%S", time.gmtime(left))}')
 				await queue_message(r)

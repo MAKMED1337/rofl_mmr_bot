@@ -1,6 +1,6 @@
-#in seconds
-cooldown = 16 * 60 * 60
+from datetime import timedelta
+
+cooldown = timedelta(hours=8)
 mn, mx = -25, 30
 
-#in seconds
-cleanup_timeout = 20
+cleanup_timeout = timedelta(minutes=1)

@@ -16,7 +16,7 @@ async def cleanup():
 		if msg is None:
 			break
 		
-		if (datetime.utcnow() - msg.date).total_seconds() < cleanup_timeout:
+		if datetime.utcnow() < msg.date + cleanup_timeout:
 			break
 
 		try:
@@ -27,7 +27,7 @@ async def cleanup():
 			await MessagesCleanup.remove(msg.group_id, msg.message_id)
 
 async def cleanup_after_timeout():
-	await asyncio.sleep(cleanup_timeout)
+	await asyncio.sleep(cleanup_timeout.total_seconds())
 	await cleanup()
 
 async def run():
