@@ -1,4 +1,4 @@
-from db_config import Base, db
+from .config import Base, db
 from sqlalchemy import Column, BIGINT, DateTime
 from sqlalchemy import select, insert, delete, and_
 

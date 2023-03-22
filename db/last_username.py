@@ -1,7 +1,7 @@
-from db_config import Base, db, fetch_one_column
+from .config import Base, db
 from sqlalchemy import Column, BIGINT, TEXT
 from sqlalchemy.dialects.mysql import insert
-from sqlalchemy import select, and_
+from sqlalchemy import select
 
 class LastUsername(Base):
 	__tablename__ = 'last_username'
@@ -14,4 +14,4 @@ class LastUsername(Base):
 
 	@staticmethod
 	async def get_username(user_id: int) -> str:
-		return await fetch_one_column(select(LastUsername.username).where(LastUsername.user_id == user_id))
+		return await db.fetch_val(select(LastUsername.username).where(LastUsername.user_id == user_id))

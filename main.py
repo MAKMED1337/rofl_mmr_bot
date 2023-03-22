@@ -8,14 +8,14 @@ from math import ceil
 import time
 import html
 
-from db_config import start as db_start, db
 from bot_config import run as run_bot, bot, command_to_regex
 from message_cleanup import run as run_cleanup, queue_message
 from config import cooldown, mn, mx
 
-from last_request import LastRequest
-from last_username import LastUsername
-from rating import Rating
+from db.config import start as db_start, db
+from db.last_request import LastRequest
+from db.last_username import LastUsername
+from db.rating import Rating
 
 def none_to_str(s: str | None, default: str='') -> str:
 	if s is None:

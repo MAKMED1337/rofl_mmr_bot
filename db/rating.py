@@ -1,8 +1,8 @@
-from db_config import Base, db, fetch_one_column
+from .config import Base, db
 from sqlalchemy import Column, BIGINT, DateTime
 from sqlalchemy.dialects.mysql import insert
 from sqlalchemy import select, and_
-from last_username import LastUsername
+from .last_username import LastUsername
 
 class Rating(Base):
 	__tablename__ = 'rating'
@@ -12,7 +12,7 @@ class Rating(Base):
 
 	@staticmethod
 	async def get(user_id: int, group_id: int) -> DateTime | None:
-		r = await fetch_one_column(select(Rating.rating).where(and_(Rating.user_id == user_id, Rating.group_id == group_id)))
+		r = await db.fetch_val(select(Rating.rating).where(and_(Rating.user_id == user_id, Rating.group_id == group_id)))
 		return 0 if r is None else r
 
 	@staticmethod
