@@ -3,7 +3,7 @@ Source code of https://t.me/rofl_mmr_bot:
 This bot has next commands:
 1. `/mmr` - gives you random amount of points
 2. `/top` - prints top by points in current group
-3. `/top10` - same as `/top `but prints only top 10 participants
+3. `/top10` - same as `/top` but prints only top 10 participants
 
 Bot uses Mysql and telethon
 
