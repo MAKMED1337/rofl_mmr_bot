@@ -10,7 +10,7 @@ import html
 
 from bot_config import run as run_bot, bot, command_to_regex
 from message_cleanup import run as run_cleanup, queue_message
-from config import cooldown, mn, mx
+from constants import cooldown, mn, mx
 
 from db.config import start as db_start, db
 from db.last_request import LastRequest

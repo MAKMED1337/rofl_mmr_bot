@@ -2,7 +2,7 @@ from datetime import datetime
 from telethon.types import Message
 import asyncio
 
-from config import cleanup_timeout
+from constants import cleanup_timeout
 from bot_config import bot
 from db.messages_cleanup import MessagesCleanup
 
