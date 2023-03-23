@@ -22,3 +22,8 @@ Secondly setup enviorment variables:
 7. `host` - mysql host(by default `localhost`)
 8. `port` - mysql port(by default `3306`)
 9. `db_name` - mysql database name
+
+Thirdly run:
+```
+python3 main.py
+```
