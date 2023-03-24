@@ -12,10 +12,7 @@ from bot_config import run as run_bot, bot, command_to_regex
 from message_cleanup import run as run_cleanup, queue_message
 from constants import cooldown, mn, mx
 
-from db.config import start as db_start, db
-from db.last_request import LastRequest
-from db.last_username import LastUsername
-from db.rating import Rating
+from db import start as db_start, db, LastRequest, LastUsername, Rating
 
 def none_to_str(s: str | None, default: str='') -> str:
 	if s is None:

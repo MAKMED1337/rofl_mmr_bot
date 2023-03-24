@@ -4,7 +4,7 @@ import asyncio
 
 from constants import cleanup_timeout
 from bot_config import bot
-from db.messages_cleanup import MessagesCleanup
+from db import MessagesCleanup
 
 async def queue_message(msg: Message):
 	await MessagesCleanup.add(msg.chat_id, msg.id, msg.date)
